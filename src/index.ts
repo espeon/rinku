@@ -23,9 +23,19 @@ app.use("/api/*", async (c, next) => {
   return auth(c, next)
 });
 
+app.delete("/*", async (c, next) => {
+  const auth = bearerAuth({ token: c.env.TOKEN })
+  return auth(c, next)
+});
+
 app.all("/favicon.ico", async (c) => {
   let cat = await fetch("https://s3.natalie.sh/nano/favicon.ico");
   return c.newResponse(await cat.arrayBuffer());
+})
+
+app.get("/all", async (c) => {
+  let kv = await c.env.KV.list()
+  return c.json(kv)
 })
 
 app.post("/api/new", async (c) => {
@@ -56,8 +66,7 @@ app.post("/api/new", async (c) => {
         body.key = hash.slice(curr, curr+5)
         curr += 1
       }
-    }
-    if(await c.env.KV.get(body.key as string) !== undefined){
+    if(await c.env.KV.get(body.key as string) === undefined){
       c.env.KV.put(body.key as string, body.url as string)
       return c.text(body.key as string)
     } else {
@@ -66,6 +75,20 @@ app.post("/api/new", async (c) => {
     }
   }
   return c.notFound();
+});
+
+app.delete("/:key", async (c) => {
+  await c.env.KV.delete(c.req.param("key"));
+  return c.text("deleted " + c.req.param("key") + " if it existed.");
+});
+
+app.patch("/:key", async (c) => {
+  let body = await c.req.parseBody();
+  if(!body.url) return err(412, c)
+  if(await c.env.KV.get(c.req.param("key")) === undefined) await err(417, c)
+  await c.env.KV.delete(c.req.param("key"))
+  await c.env.KV.put(c.req.param("key"), body.url as string)
+  return c.text("Modified " + c.req.param("key"));
 });
 
 app.get("/:key", async (c) => {
