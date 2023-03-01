@@ -66,6 +66,7 @@ app.post("/api/new", async (c) => {
         body.key = hash.slice(curr, curr+5)
         curr += 1
       }
+    }
     if(await c.env.KV.get(body.key as string) === undefined){
       c.env.KV.put(body.key as string, body.url as string)
       return c.text(body.key as string)
