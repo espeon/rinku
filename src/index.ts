@@ -15,7 +15,7 @@ async function err(code: number, c: Context): Promise<Response> {
   return c.newResponse(await cat.arrayBuffer(), code as StatusCode);
 }
 
-app.get("/", (c) => c.text("hello hono, this is rinku!"));
+app.get("/", (c) => c.text("hello hono, this is rinku! ▲"));
 
 app.use("/api/*", cors());
 app.use("/api/*", async (c, next) => {
@@ -67,7 +67,7 @@ app.post("/api/new", async (c) => {
         curr += 1
       }
     }
-    if(await c.env.KV.get(body.key as string) === undefined){
+    if(await c.env.KV.get(body.key as string) == undefined){
       c.env.KV.put(body.key as string, body.url as string)
       return c.text(body.key as string)
     } else {
