@@ -1,5 +1,6 @@
 ## rinku
-simple link shortener, for Cloudflare Workers
+simple link shortener, for Cloudflare Workers.
+also acts as an (optional) plausible proxy.
 ---
 
 develop
