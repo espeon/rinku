@@ -25,6 +25,33 @@ app.use("/api/*", async (c, next) => {
   return auth(c, next)
 });
 
+app.use("/.well-known/did.json", (c) => c.json(`{
+	"@context": [
+		"https://www.w3.org/ns/did/v1",
+		"https://w3id.org/security/multikey/v1",
+		"https://w3id.org/security/suites/secp256k1-2019/v1"
+	],
+	"id": "did:web:nat.vg",
+	"alsoKnownAs": [
+		"at://nat.vg"
+	],
+	"verificationMethod": [
+		{
+			"id": "did:web:nat.vg#atproto",
+			"type": "Multikey",
+			"controller": "did:web:nat.vg",
+			"publicKeyMultibase": "zQ3shap6oR3B8SCR1XBR1ivGhpioynwfQudFsATpUhFxSHz6T"
+		}
+	],
+	"service": [
+		{
+			"id": "#atproto_pds",
+			"type": "AtprotoPersonalDataServer",
+			"serviceEndpoint": "https://mraow.party"
+		}
+	]
+}`));
+
 app.delete("/*", async (c, next) => {
   const auth = bearerAuth({ token: c.env.TOKEN })
   return auth(c, next)
